@@ -1,0 +1,35 @@
+
+entity Message{
+	title String required,
+	url String required,
+	description String
+	 
+}
+
+entity Points
+
+//relationship OneToMany{
+//	User to Message{author required} 
+//}
+relationship ManyToOne{
+	Message{author required} to User,
+	Points {person required} to User,
+	Points {mensaje required} to Message ,
+	Message{parent} to Message
+}
+//relationship OneToMany{
+//	ExtendedUser to Points{person} ,
+//	Message to Points{mensaje} 
+//}
+
+//relationship OneToOne{
+//ExtendedUser{usuario} to User
+//}
+
+//relationship ManyToOne{
+//Message{parent} to Message
+//}
+
+
+
+

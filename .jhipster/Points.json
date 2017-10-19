@@ -1,0 +1,25 @@
+{
+    "fluentMethods": true,
+    "relationships": [
+        {
+            "relationshipType": "many-to-one",
+            "relationshipValidateRules": "required",
+            "relationshipName": "person",
+            "otherEntityName": "user",
+            "otherEntityField": "id"
+        },
+        {
+            "relationshipType": "many-to-one",
+            "relationshipValidateRules": "required",
+            "relationshipName": "mensaje",
+            "otherEntityName": "message",
+            "otherEntityField": "id"
+        }
+    ],
+    "fields": [],
+    "changelogDate": "20171018165452",
+    "entityTableName": "points",
+    "dto": "no",
+    "pagination": "no",
+    "service": "no"
+}
