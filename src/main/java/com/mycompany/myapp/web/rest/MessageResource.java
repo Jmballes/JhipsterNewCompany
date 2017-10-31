@@ -114,7 +114,13 @@ public class MessageResource {
     @Timed
     public ResponseEntity<List<Message>> getAllMessages(@ApiParam Pageable pageable) {
         log.debug("REST request to get a page of Messages");
-        Page<Message> page = messageRepository.findAll(pageable);
+        Page<Message> page;
+        if (SecurityUtils.isCurrentUserInRole(AuthoritiesConstants.ADMIN)) {
+        	page = messageRepository.findAllByOrderByIdDesc(pageable);
+        }else{
+        	page = messageRepository.findByAuthorIsCurrentUser(pageable);
+        }
+        //Page<Message> page = messageRepository.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/messages");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
