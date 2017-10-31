@@ -2,8 +2,8 @@
 entity Message{
 	title String required,
 	url String required,
-	description String
-	 
+	description String,
+	fecha Date 
 }
 
 entity Points
