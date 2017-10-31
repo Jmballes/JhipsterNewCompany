@@ -14,6 +14,9 @@
             "follow": "contacto @java_hipster en Twitter"
         },
         "like": "Si te gusta JHipster, danos una estrella en",
-        "github": "GitHub"
+        "github": "GitHub",
+        "points":{
+        	"getMoving": "No tienes ningun punto, lo siento"
+        }
     }
 }

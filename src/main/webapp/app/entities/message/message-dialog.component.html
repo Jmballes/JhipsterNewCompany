@@ -40,10 +40,10 @@
                 [(ngModel)]="message.description"  />
         </div>
 
-        <div class="form-group">
+        <div class="form-group" *jhiHasAnyAuthority="'ROLE_ADMIN'">
             <label class="form-control-label" jhiTranslate="jhipsterNewCompanyApp.message.author" for="field_author">Author</label>
             <select class="form-control" id="field_author" name="author" [(ngModel)]="message.author"  required>
-                <option *ngIf="!editForm.value.author" [ngValue]="null" selected></option>
+                <option [ngValue]="null" selected></option>
                 <option [ngValue]="userOption.id === message.author?.id ? message.author : userOption" *ngFor="let userOption of users; trackBy: trackUserById">{{userOption.id}}</option>
             </select>
         </div>

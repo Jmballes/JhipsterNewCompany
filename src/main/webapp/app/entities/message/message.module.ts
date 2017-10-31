@@ -14,6 +14,7 @@ import {
     MessageDeleteDialogComponent,
     messageRoute,
     messagePopupRoute,
+    MessageResolvePagingParams,
 } from './';
 
 const ENTITY_STATES = [
@@ -45,6 +46,7 @@ const ENTITY_STATES = [
     providers: [
         MessageService,
         MessagePopupService,
+        MessageResolvePagingParams,
     ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })

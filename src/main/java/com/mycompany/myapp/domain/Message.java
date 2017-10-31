@@ -36,7 +36,7 @@ public class Message implements Serializable {
     private String description;
 
     @ManyToOne(optional = false)
-    @NotNull
+   
     private User author;
 
     @ManyToOne

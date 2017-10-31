@@ -38,6 +38,6 @@
     "changelogDate": "20171018165451",
     "entityTableName": "message",
     "dto": "no",
-    "pagination": "no",
+    "pagination": "pagination",
     "service": "no"
 }

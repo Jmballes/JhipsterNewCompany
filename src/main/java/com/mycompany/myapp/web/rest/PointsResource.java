@@ -5,17 +5,29 @@ import com.mycompany.myapp.domain.Points;
 
 import com.mycompany.myapp.repository.PointsRepository;
 import com.mycompany.myapp.repository.search.PointsSearchRepository;
+import com.mycompany.myapp.security.AuthoritiesConstants;
+import com.mycompany.myapp.security.SecurityUtils;
 import com.mycompany.myapp.web.rest.util.HeaderUtil;
+import com.mycompany.myapp.web.rest.util.PaginationUtil;
+import com.mycompany.myapp.web.rest.vm.PointsPerWeek;
+
 import io.github.jhipster.web.util.ResponseUtil;
+import io.swagger.annotations.ApiParam;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
-
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -143,5 +155,35 @@ public class PointsResource {
             .stream(pointsSearchRepository.search(queryStringQuery(query)).spliterator(), false)
             .collect(Collectors.toList());
     }
+    @GetMapping("/points-this-week")
+    @Timed
+    public ResponseEntity<PointsPerWeek> getPointsThisWeek(){
+    	LocalDate now=LocalDate.now();
+    	LocalDate startOfWeek = now.with(DayOfWeek.MONDAY);
+    	LocalDate endOfWeek= now.with(DayOfWeek.SUNDAY);
+    	log.debug("Busqueda de puntos entre: {} y {}",startOfWeek,endOfWeek);
+    	List<Points> points = pointsRepository.findByPersonIsCurrentUser();
+    	return calculatePoints(points);
+    }
+    
+    private ResponseEntity<PointsPerWeek> calculatePoints( List<Points> points){
+    	Integer numPoints= points.stream().mapToInt(p -> 1).sum();
 
+    	PointsPerWeek count= new PointsPerWeek(LocalDate.now(), numPoints);
+    	log.debug("Se devuelve count: {} y fecha {}", count.getPoints(),count.getWeek());
+    	return new ResponseEntity<>(count,HttpStatus.OK);
+    }
+    
+//    public ResponseEntity<List<Points>> getAllPoints(@ApiParam Pageable pageable){
+//    	log.debug("Rest request to get a page of Points");
+//    	Page<Points> page;
+//    	if (SecurityUtils.isCurrentUserInRole(AuthoritiesConstants.ADMIN)){
+//    		page=pointsRepository.findAllByOrderByDateDesc(pageable);
+//    		
+//    	}else{
+//    		page = pointsRepository.findByUserIsCurrentUser(pageable);
+//    	}
+//    	HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "api/points");
+//    	return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+//    }
 }

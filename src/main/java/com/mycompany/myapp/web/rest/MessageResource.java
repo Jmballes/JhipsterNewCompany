@@ -4,11 +4,20 @@ import com.codahale.metrics.annotation.Timed;
 import com.mycompany.myapp.domain.Message;
 
 import com.mycompany.myapp.repository.MessageRepository;
+import com.mycompany.myapp.repository.UserRepository;
 import com.mycompany.myapp.repository.search.MessageSearchRepository;
+import com.mycompany.myapp.security.AuthoritiesConstants;
+import com.mycompany.myapp.security.SecurityUtils;
 import com.mycompany.myapp.web.rest.util.HeaderUtil;
+import com.mycompany.myapp.web.rest.util.PaginationUtil;
+import io.swagger.annotations.ApiParam;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,9 +47,13 @@ public class MessageResource {
 
     private final MessageSearchRepository messageSearchRepository;
 
-    public MessageResource(MessageRepository messageRepository, MessageSearchRepository messageSearchRepository) {
-        this.messageRepository = messageRepository;
+    private final UserRepository userRepository;
+    //public MessageResource(MessageRepository messageRepository, MessageSearchRepository messageSearchRepository) {
+    public MessageResource(MessageRepository messageRepository, MessageSearchRepository messageSearchRepository,UserRepository userRepository) {
+    	    
+    	this.messageRepository = messageRepository;
         this.messageSearchRepository = messageSearchRepository;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -56,6 +69,10 @@ public class MessageResource {
         log.debug("REST request to save Message : {}", message);
         if (message.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "A new message cannot already have an ID")).body(null);
+        }
+        if (!SecurityUtils.isCurrentUserInRole(AuthoritiesConstants.ADMIN)){
+        	log.debug("No se ha pasado usuario, usando usuario actual {}",SecurityUtils.getCurrentUserLogin());
+        	message.setAuthor(userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get());
         }
         Message result = messageRepository.save(message);
         messageSearchRepository.save(result);
@@ -90,14 +107,17 @@ public class MessageResource {
     /**
      * GET  /messages : get all the messages.
      *
+     * @param pageable the pagination information
      * @return the ResponseEntity with status 200 (OK) and the list of messages in body
      */
     @GetMapping("/messages")
     @Timed
-    public List<Message> getAllMessages() {
-        log.debug("REST request to get all Messages");
-        return messageRepository.findAll();
-        }
+    public ResponseEntity<List<Message>> getAllMessages(@ApiParam Pageable pageable) {
+        log.debug("REST request to get a page of Messages");
+        Page<Message> page = messageRepository.findAll(pageable);
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/messages");
+        return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+    }
 
     /**
      * GET  /messages/:id : get the "id" message.
@@ -133,15 +153,16 @@ public class MessageResource {
      * to the query.
      *
      * @param query the query of the message search
+     * @param pageable the pagination information
      * @return the result of the search
      */
     @GetMapping("/_search/messages")
     @Timed
-    public List<Message> searchMessages(@RequestParam String query) {
-        log.debug("REST request to search Messages for query {}", query);
-        return StreamSupport
-            .stream(messageSearchRepository.search(queryStringQuery(query)).spliterator(), false)
-            .collect(Collectors.toList());
+    public ResponseEntity<List<Message>> searchMessages(@RequestParam String query, @ApiParam Pageable pageable) {
+        log.debug("REST request to search for a page of Messages for query {}", query);
+        Page<Message> page = messageSearchRepository.search(queryStringQuery(query), pageable);
+        HttpHeaders headers = PaginationUtil.generateSearchPaginationHttpHeaders(query, page, "/api/_search/messages");
+        return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
 
 }

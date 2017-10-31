@@ -13,7 +13,7 @@
                    [(ngModel)]="points.id" readonly />
         </div>
 
-        <div class="form-group">
+        <div class="form-group" *jhiHasAnyAuthority="'ROLE_ADMIN'">
             <label class="form-control-label" jhiTranslate="jhipsterNewCompanyApp.points.person" for="field_person">Person</label>
             <select class="form-control" id="field_person" name="person" [(ngModel)]="points.person"  required>
                 <option *ngIf="!editForm.value.person" [ngValue]="null" selected></option>
