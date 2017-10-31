@@ -23,6 +23,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,6 +49,9 @@ public class MessageResourceIntTest {
 
     private static final String DEFAULT_DESCRIPTION = "AAAAAAAAAA";
     private static final String UPDATED_DESCRIPTION = "BBBBBBBBBB";
+
+    private static final LocalDate DEFAULT_FECHA = LocalDate.ofEpochDay(0L);
+    private static final LocalDate UPDATED_FECHA = LocalDate.now(ZoneId.systemDefault());
 
     @Autowired
     private MessageRepository messageRepository;
@@ -90,7 +95,8 @@ public class MessageResourceIntTest {
         Message message = new Message()
             .title(DEFAULT_TITLE)
             .url(DEFAULT_URL)
-            .description(DEFAULT_DESCRIPTION);
+            .description(DEFAULT_DESCRIPTION)
+            .fecha(DEFAULT_FECHA);
         // Add required entity
         User author = UserResourceIntTest.createEntity(em);
         em.persist(author);
@@ -123,6 +129,7 @@ public class MessageResourceIntTest {
         assertThat(testMessage.getTitle()).isEqualTo(DEFAULT_TITLE);
         assertThat(testMessage.getUrl()).isEqualTo(DEFAULT_URL);
         assertThat(testMessage.getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
+        assertThat(testMessage.getFecha()).isEqualTo(DEFAULT_FECHA);
 
         // Validate the Message in Elasticsearch
         Message messageEs = messageSearchRepository.findOne(testMessage.getId());
@@ -197,7 +204,8 @@ public class MessageResourceIntTest {
             .andExpect(jsonPath("$.[*].id").value(hasItem(message.getId().intValue())))
             .andExpect(jsonPath("$.[*].title").value(hasItem(DEFAULT_TITLE.toString())))
             .andExpect(jsonPath("$.[*].url").value(hasItem(DEFAULT_URL.toString())))
-            .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION.toString())));
+            .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION.toString())))
+            .andExpect(jsonPath("$.[*].fecha").value(hasItem(DEFAULT_FECHA.toString())));
     }
 
     @Test
@@ -213,7 +221,8 @@ public class MessageResourceIntTest {
             .andExpect(jsonPath("$.id").value(message.getId().intValue()))
             .andExpect(jsonPath("$.title").value(DEFAULT_TITLE.toString()))
             .andExpect(jsonPath("$.url").value(DEFAULT_URL.toString()))
-            .andExpect(jsonPath("$.description").value(DEFAULT_DESCRIPTION.toString()));
+            .andExpect(jsonPath("$.description").value(DEFAULT_DESCRIPTION.toString()))
+            .andExpect(jsonPath("$.fecha").value(DEFAULT_FECHA.toString()));
     }
 
     @Test
@@ -237,7 +246,8 @@ public class MessageResourceIntTest {
         updatedMessage
             .title(UPDATED_TITLE)
             .url(UPDATED_URL)
-            .description(UPDATED_DESCRIPTION);
+            .description(UPDATED_DESCRIPTION)
+            .fecha(UPDATED_FECHA);
 
         restMessageMockMvc.perform(put("/api/messages")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -251,6 +261,7 @@ public class MessageResourceIntTest {
         assertThat(testMessage.getTitle()).isEqualTo(UPDATED_TITLE);
         assertThat(testMessage.getUrl()).isEqualTo(UPDATED_URL);
         assertThat(testMessage.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
+        assertThat(testMessage.getFecha()).isEqualTo(UPDATED_FECHA);
 
         // Validate the Message in Elasticsearch
         Message messageEs = messageSearchRepository.findOne(testMessage.getId());
@@ -311,7 +322,8 @@ public class MessageResourceIntTest {
             .andExpect(jsonPath("$.[*].id").value(hasItem(message.getId().intValue())))
             .andExpect(jsonPath("$.[*].title").value(hasItem(DEFAULT_TITLE.toString())))
             .andExpect(jsonPath("$.[*].url").value(hasItem(DEFAULT_URL.toString())))
-            .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION.toString())));
+            .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION.toString())))
+            .andExpect(jsonPath("$.[*].fecha").value(hasItem(DEFAULT_FECHA.toString())));
     }
 
     @Test

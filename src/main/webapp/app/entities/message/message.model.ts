@@ -6,6 +6,7 @@ export class Message implements BaseEntity {
         public title?: string,
         public url?: string,
         public description?: string,
+        public fecha?: any,
         public author?: User,
         public parent?: BaseEntity,
     ) {

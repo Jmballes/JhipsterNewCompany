@@ -24,6 +24,7 @@ export class MessageDialogComponent implements OnInit {
     users: User[];
 
     messages: Message[];
+    fechaDp: any;
 
     constructor(
         public activeModal: NgbActiveModal,

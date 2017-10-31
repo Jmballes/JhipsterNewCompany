@@ -19,6 +19,7 @@
             "title": "Title",
             "url": "Url",
             "description": "Description",
+            "fecha": "Fecha",
             "author": "Author",
             "parent": "Parent"
         }

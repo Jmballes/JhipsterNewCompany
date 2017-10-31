@@ -26,6 +26,13 @@ export class MessagePopupService {
 
             if (id) {
                 this.messageService.find(id).subscribe((message) => {
+                    if (message.fecha) {
+                        message.fecha = {
+                            year: message.fecha.getFullYear(),
+                            month: message.fecha.getMonth() + 1,
+                            day: message.fecha.getDate()
+                        };
+                    }
                     this.ngbModalRef = this.messageModalRef(component, message);
                     resolve(this.ngbModalRef);
                 });

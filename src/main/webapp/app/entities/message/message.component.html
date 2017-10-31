@@ -33,6 +33,7 @@
             <th jhiSortBy="title"><span jhiTranslate="jhipsterNewCompanyApp.message.title">Title</span> <span class="fa fa-sort"></span></th>
             <th jhiSortBy="url"><span jhiTranslate="jhipsterNewCompanyApp.message.url">Url</span> <span class="fa fa-sort"></span></th>
             <th jhiSortBy="description"><span jhiTranslate="jhipsterNewCompanyApp.message.description">Description</span> <span class="fa fa-sort"></span></th>
+            <th jhiSortBy="fecha"><span jhiTranslate="jhipsterNewCompanyApp.message.fecha">Fecha</span> <span class="fa fa-sort"></span></th>
             <th jhiSortBy="author.id"><span jhiTranslate="jhipsterNewCompanyApp.message.author">Author</span> <span class="fa fa-sort"></span></th>
             <th jhiSortBy="parent.id"><span jhiTranslate="jhipsterNewCompanyApp.message.parent">Parent</span> <span class="fa fa-sort"></span></th>
             <th></th>
@@ -44,6 +45,7 @@
                 <td>{{message.title}}</td>
                 <td>{{message.url}}</td>
                 <td>{{message.description}}</td>
+                <td>{{message.fecha | date:'mediumDate'}}</td>
                 <td>
                     {{message.author?.id}} {{message.author?.login}}
                 </td>

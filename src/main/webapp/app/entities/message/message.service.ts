@@ -3,6 +3,8 @@ import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Rx';
 import { SERVER_API_URL } from '../../app.constants';
 
+import { JhiDateUtils } from 'ng-jhipster';
+
 import { Message } from './message.model';
 import { ResponseWrapper, createRequestOption } from '../../shared';
 
@@ -12,7 +14,7 @@ export class MessageService {
     private resourceUrl = SERVER_API_URL + 'api/messages';
     private resourceSearchUrl = SERVER_API_URL + 'api/_search/messages';
 
-    constructor(private http: Http) { }
+    constructor(private http: Http, private dateUtils: JhiDateUtils) { }
 
     create(message: Message): Observable<Message> {
         const copy = this.convert(message);
@@ -67,6 +69,8 @@ export class MessageService {
      */
     private convertItemFromServer(json: any): Message {
         const entity: Message = Object.assign(new Message(), json);
+        entity.fecha = this.dateUtils
+            .convertLocalDateFromServer(json.fecha);
         return entity;
     }
 
@@ -75,6 +79,8 @@ export class MessageService {
      */
     private convert(message: Message): Message {
         const copy: Message = Object.assign({}, message);
+        copy.fecha = this.dateUtils
+            .convertLocalDateToServer(message.fecha);
         return copy;
     }
 }

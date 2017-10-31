@@ -3,7 +3,7 @@ entity Message{
 	title String required,
 	url String required,
 	description String,
-	fecha Date 
+	fecha LocalDate 
 }
 
 entity Points

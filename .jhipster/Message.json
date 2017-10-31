@@ -33,6 +33,10 @@
         {
             "fieldName": "description",
             "fieldType": "String"
+        },
+        {
+            "fieldName": "fecha",
+            "fieldType": "LocalDate"
         }
     ],
     "changelogDate": "20171018165451",

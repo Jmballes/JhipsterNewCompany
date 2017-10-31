@@ -7,6 +7,7 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Objects;
 
 /**
@@ -34,6 +35,9 @@ public class Message implements Serializable {
 
     @Column(name = "description")
     private String description;
+
+    @Column(name = "fecha")
+    private LocalDate fecha;
 
     @ManyToOne(optional = false)
    
@@ -90,6 +94,19 @@ public class Message implements Serializable {
         this.description = description;
     }
 
+    public LocalDate getFecha() {
+        return fecha;
+    }
+
+    public Message fecha(LocalDate fecha) {
+        this.fecha = fecha;
+        return this;
+    }
+
+    public void setFecha(LocalDate fecha) {
+        this.fecha = fecha;
+    }
+
     public User getAuthor() {
         return author;
     }
@@ -144,6 +161,7 @@ public class Message implements Serializable {
             ", title='" + getTitle() + "'" +
             ", url='" + getUrl() + "'" +
             ", description='" + getDescription() + "'" +
+            ", fecha='" + getFecha() + "'" +
             "}";
     }
 }

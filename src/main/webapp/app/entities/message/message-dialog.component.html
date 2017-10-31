@@ -39,6 +39,16 @@
             <input type="text" class="form-control" name="description" id="field_description"
                 [(ngModel)]="message.description"  />
         </div>
+        <div class="form-group">
+            <label class="form-control-label" jhiTranslate="jhipsterNewCompanyApp.message.fecha" for="field_fecha">Fecha</label>
+            <div class="input-group">
+                <input id="field_fecha" type="text" class="form-control" name="fecha" ngbDatepicker  #fechaDp="ngbDatepicker" [(ngModel)]="message.fecha"
+                />
+                <span class="input-group-btn">
+                    <button type="button" class="btn btn-secondary" (click)="fechaDp.toggle()"><i class="fa fa-calendar"></i></button>
+                </span>
+            </div>
+        </div>
 
         <div class="form-group" *jhiHasAnyAuthority="'ROLE_ADMIN'">
             <label class="form-control-label" jhiTranslate="jhipsterNewCompanyApp.message.author" for="field_author">Author</label>

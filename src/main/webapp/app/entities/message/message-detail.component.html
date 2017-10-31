@@ -16,6 +16,10 @@
         <dd>
             <span>{{message.description}}</span>
         </dd>
+        <dt><span jhiTranslate="jhipsterNewCompanyApp.message.fecha">Fecha</span></dt>
+        <dd>
+            <span>{{message.fecha | date:'mediumDate'}}</span>
+        </dd>
         <dt><span jhiTranslate="jhipsterNewCompanyApp.message.author">Author</span></dt>
         <dd>
             {{message.author?.id}}

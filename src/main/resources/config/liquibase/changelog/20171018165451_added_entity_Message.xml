@@ -34,6 +34,10 @@
                 <constraints nullable="true" />
             </column>
 
+            <column name="fecha" type="date">
+                <constraints nullable="true" />
+            </column>
+
             <column name="author_id" type="bigint">
                 <constraints nullable="false" />
             </column>
