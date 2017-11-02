@@ -2,23 +2,13 @@ package com.mycompany.myapp.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import com.mycompany.myapp.domain.Points;
-
-import com.mycompany.myapp.repository.PointsRepository;
-import com.mycompany.myapp.repository.search.PointsSearchRepository;
-import com.mycompany.myapp.security.AuthoritiesConstants;
-import com.mycompany.myapp.security.SecurityUtils;
+import com.mycompany.myapp.service.PointsService;
 import com.mycompany.myapp.web.rest.util.HeaderUtil;
-import com.mycompany.myapp.web.rest.util.PaginationUtil;
 import com.mycompany.myapp.web.rest.vm.PointsPerWeek;
 
 import io.github.jhipster.web.util.ResponseUtil;
-import io.swagger.annotations.ApiParam;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +20,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static org.elasticsearch.index.query.QueryBuilders.*;
@@ -46,15 +35,10 @@ public class PointsResource {
 
     private static final String ENTITY_NAME = "points";
 
-    private final PointsRepository pointsRepository;
+    private final PointsService pointsService;
 
-    private final PointsSearchRepository pointsSearchRepository;
-
-
-    public PointsResource(PointsRepository pointsRepository, PointsSearchRepository pointsSearchRepository) {
-        this.pointsRepository = pointsRepository;
-        this.pointsSearchRepository = pointsSearchRepository;
-        
+    public PointsResource(PointsService pointsService) {
+        this.pointsService = pointsService;
     }
 
     /**
@@ -71,8 +55,7 @@ public class PointsResource {
         if (points.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "A new points cannot already have an ID")).body(null);
         }
-        Points result = pointsRepository.save(points);
-        pointsSearchRepository.save(result);
+        Points result = pointsService.save(points);
         return ResponseEntity.created(new URI("/api/points/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
@@ -94,8 +77,7 @@ public class PointsResource {
         if (points.getId() == null) {
             return createPoints(points);
         }
-        Points result = pointsRepository.save(points);
-        pointsSearchRepository.save(result);
+        Points result = pointsService.save(points);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, points.getId().toString()))
             .body(result);
@@ -110,7 +92,7 @@ public class PointsResource {
     @Timed
     public List<Points> getAllPoints() {
         log.debug("REST request to get all Points");
-        return pointsRepository.findAll();
+        return pointsService.findAll();
         }
 
     /**
@@ -123,7 +105,7 @@ public class PointsResource {
     @Timed
     public ResponseEntity<Points> getPoints(@PathVariable Long id) {
         log.debug("REST request to get Points : {}", id);
-        Points points = pointsRepository.findOne(id);
+        Points points = pointsService.findOne(id);
         return ResponseUtil.wrapOrNotFound(Optional.ofNullable(points));
     }
 
@@ -137,8 +119,7 @@ public class PointsResource {
     @Timed
     public ResponseEntity<Void> deletePoints(@PathVariable Long id) {
         log.debug("REST request to delete Points : {}", id);
-        pointsRepository.delete(id);
-        pointsSearchRepository.delete(id);
+        pointsService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
 
@@ -153,28 +134,16 @@ public class PointsResource {
     @Timed
     public List<Points> searchPoints(@RequestParam String query) {
         log.debug("REST request to search Points for query {}", query);
-        return StreamSupport
-            .stream(pointsSearchRepository.search(queryStringQuery(query)).spliterator(), false)
-            .collect(Collectors.toList());
+        return pointsService.search(query);
     }
     @GetMapping("/points-this-week")
     @Timed
     public ResponseEntity<PointsPerWeek> getPointsThisWeek(){
-    	LocalDate now=LocalDate.now();
-    	LocalDate startOfWeek = now.with(DayOfWeek.MONDAY);
-    	LocalDate endOfWeek= now.with(DayOfWeek.SUNDAY);
-    	log.debug("Busqueda de puntos entre: {} y {}",startOfWeek,endOfWeek);
-    	List<Points> points = pointsRepository.findByPersonIsCurrentUser();
-    	return calculatePoints(points);
+
+    	return pointsService.getPointsThisWeek();
     }
     
-    private ResponseEntity<PointsPerWeek> calculatePoints( List<Points> points){
-    	Integer numPoints= points.stream().mapToInt(p -> 1).sum();
 
-    	PointsPerWeek count= new PointsPerWeek(LocalDate.now(), numPoints);
-    	log.debug("Se devuelve count: {} y fecha {}", count.getPoints(),count.getWeek());
-    	return new ResponseEntity<>(count,HttpStatus.OK);
-    }
     
 
 }

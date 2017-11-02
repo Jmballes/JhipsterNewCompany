@@ -5,6 +5,7 @@ import com.mycompany.myapp.JhipsterNewCompanyApp;
 import com.mycompany.myapp.domain.Message;
 import com.mycompany.myapp.domain.User;
 import com.mycompany.myapp.repository.MessageRepository;
+import com.mycompany.myapp.service.MessageService;
 import com.mycompany.myapp.repository.search.MessageSearchRepository;
 import com.mycompany.myapp.web.rest.errors.ExceptionTranslator;
 
@@ -57,6 +58,9 @@ public class MessageResourceIntTest {
     private MessageRepository messageRepository;
 
     @Autowired
+    private MessageService messageService;
+
+    @Autowired
     private MessageSearchRepository messageSearchRepository;
 
     @Autowired
@@ -78,7 +82,7 @@ public class MessageResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final MessageResource messageResource = new MessageResource(messageRepository, messageSearchRepository);
+        final MessageResource messageResource = new MessageResource(messageService);
         this.restMessageMockMvc = MockMvcBuilders.standaloneSetup(messageResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
@@ -237,8 +241,8 @@ public class MessageResourceIntTest {
     @Transactional
     public void updateMessage() throws Exception {
         // Initialize the database
-        messageRepository.saveAndFlush(message);
-        messageSearchRepository.save(message);
+        messageService.save(message);
+
         int databaseSizeBeforeUpdate = messageRepository.findAll().size();
 
         // Update the message
@@ -290,8 +294,8 @@ public class MessageResourceIntTest {
     @Transactional
     public void deleteMessage() throws Exception {
         // Initialize the database
-        messageRepository.saveAndFlush(message);
-        messageSearchRepository.save(message);
+        messageService.save(message);
+
         int databaseSizeBeforeDelete = messageRepository.findAll().size();
 
         // Get the message
@@ -312,8 +316,7 @@ public class MessageResourceIntTest {
     @Transactional
     public void searchMessage() throws Exception {
         // Initialize the database
-        messageRepository.saveAndFlush(message);
-        messageSearchRepository.save(message);
+        messageService.save(message);
 
         // Search the message
         restMessageMockMvc.perform(get("/api/_search/messages?query=id:" + message.getId()))

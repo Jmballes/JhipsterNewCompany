@@ -2,12 +2,10 @@ package com.mycompany.myapp.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import com.mycompany.myapp.domain.Message;
-
-import com.mycompany.myapp.repository.MessageRepository;
 import com.mycompany.myapp.repository.UserRepository;
-import com.mycompany.myapp.repository.search.MessageSearchRepository;
 import com.mycompany.myapp.security.AuthoritiesConstants;
 import com.mycompany.myapp.security.SecurityUtils;
+import com.mycompany.myapp.service.MessageService;
 import com.mycompany.myapp.web.rest.util.HeaderUtil;
 import com.mycompany.myapp.web.rest.util.PaginationUtil;
 import io.swagger.annotations.ApiParam;
@@ -27,7 +25,6 @@ import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static org.elasticsearch.index.query.QueryBuilders.*;
@@ -43,16 +40,11 @@ public class MessageResource {
 
     private static final String ENTITY_NAME = "message";
 
-    private final MessageRepository messageRepository;
-
-    private final MessageSearchRepository messageSearchRepository;
+    private final MessageService messageService;
 
     private final UserRepository userRepository;
-    //public MessageResource(MessageRepository messageRepository, MessageSearchRepository messageSearchRepository) {
-    public MessageResource(MessageRepository messageRepository, MessageSearchRepository messageSearchRepository,UserRepository userRepository) {
-    	    
-    	this.messageRepository = messageRepository;
-        this.messageSearchRepository = messageSearchRepository;
+    public MessageResource(MessageService messageService,UserRepository userRepository) {
+        this.messageService = messageService;
         this.userRepository = userRepository;
     }
 
@@ -67,7 +59,6 @@ public class MessageResource {
     @Timed
     public ResponseEntity<Message> createMessage(@Valid @RequestBody Message message) throws URISyntaxException {
         log.debug("REST request to save Message : {}", message);
-
         if (message.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "A new message cannot already have an ID")).body(null);
         }
@@ -78,9 +69,7 @@ public class MessageResource {
         if (message.getFecha()==null){
         	message.setFecha(LocalDate.now());
         }
-        
-        Message result = messageRepository.save(message);
-        messageSearchRepository.save(result);
+        Message result = messageService.save(message);
         return ResponseEntity.created(new URI("/api/messages/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
@@ -102,8 +91,7 @@ public class MessageResource {
         if (message.getId() == null) {
             return createMessage(message);
         }
-        Message result = messageRepository.save(message);
-        messageSearchRepository.save(result);
+        Message result = messageService.save(message);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, message.getId().toString()))
             .body(result);
@@ -121,11 +109,11 @@ public class MessageResource {
         log.debug("REST request to get a page of Messages");
         Page<Message> page;
         if (SecurityUtils.isCurrentUserInRole(AuthoritiesConstants.ADMIN)) {
-        	page = messageRepository.findAllByOrderByIdDesc(pageable);
+        	page = messageService.findAllByOrderByIdDesc(pageable);
         }else{
-        	page = messageRepository.findByAuthorIsCurrentUser(pageable);
+        	page = messageService.findByAuthorIsCurrentUser(pageable);
         }
-        //Page<Message> page = messageRepository.findAll(pageable);
+        //Page<Message> page = messageService.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/messages");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
@@ -140,7 +128,7 @@ public class MessageResource {
     @Timed
     public ResponseEntity<Message> getMessage(@PathVariable Long id) {
         log.debug("REST request to get Message : {}", id);
-        Message message = messageRepository.findOne(id);
+        Message message = messageService.findOne(id);
         return ResponseUtil.wrapOrNotFound(Optional.ofNullable(message));
     }
 
@@ -154,8 +142,7 @@ public class MessageResource {
     @Timed
     public ResponseEntity<Void> deleteMessage(@PathVariable Long id) {
         log.debug("REST request to delete Message : {}", id);
-        messageRepository.delete(id);
-        messageSearchRepository.delete(id);
+        messageService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
 
@@ -171,7 +158,7 @@ public class MessageResource {
     @Timed
     public ResponseEntity<List<Message>> searchMessages(@RequestParam String query, @ApiParam Pageable pageable) {
         log.debug("REST request to search for a page of Messages for query {}", query);
-        Page<Message> page = messageSearchRepository.search(queryStringQuery(query), pageable);
+        Page<Message> page = messageService.search(query, pageable);
         HttpHeaders headers = PaginationUtil.generateSearchPaginationHttpHeaders(query, page, "/api/_search/messages");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }

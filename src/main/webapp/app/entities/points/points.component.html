@@ -39,11 +39,11 @@
             <tr *ngFor="let points of points ;trackBy: trackId">
                 <td><a [routerLink]="['../points', points.id ]">{{points.id}}</a></td>
                 <td>
-                    {{points.person?.login}}({{points.person?.id}})
+                    {{points.person?.id}}
                 </td>
                 <td>
                     <div *ngIf="points.mensaje">
-                        <a [routerLink]="['../message', points.mensaje?.id ]" >{{points.mensaje?.title}}({{points.mensaje?.id}})</a>
+                        <a [routerLink]="['../message', points.mensaje?.id ]" >{{points.mensaje?.id}}</a>
                     </div>
                 </td>
                 <td class="text-right">

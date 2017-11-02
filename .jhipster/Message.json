@@ -43,5 +43,5 @@
     "entityTableName": "message",
     "dto": "no",
     "pagination": "pagination",
-    "service": "no"
+    "service": "serviceClass"
 }

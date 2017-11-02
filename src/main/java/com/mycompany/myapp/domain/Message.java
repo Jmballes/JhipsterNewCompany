@@ -40,7 +40,10 @@ public class Message implements Serializable {
     private LocalDate fecha;
 
     @ManyToOne(optional = false)
-   
+    //jmb - Se comenta obligación de añadir autor, ya que en la comunicación entre cliente
+    // y servidor, si este no viene relleno, se entiende que es el usuario que esta loggado,
+    //y si viene relleno, es que un administrador ha eledigo dicho autor.
+    //@NotNull
     private User author;
 
     @ManyToOne

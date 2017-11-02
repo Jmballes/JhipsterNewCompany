@@ -6,6 +6,7 @@ import com.mycompany.myapp.domain.Points;
 import com.mycompany.myapp.domain.User;
 import com.mycompany.myapp.domain.Message;
 import com.mycompany.myapp.repository.PointsRepository;
+import com.mycompany.myapp.service.PointsService;
 import com.mycompany.myapp.repository.search.PointsSearchRepository;
 import com.mycompany.myapp.web.rest.errors.ExceptionTranslator;
 
@@ -44,6 +45,9 @@ public class PointsResourceIntTest {
     private PointsRepository pointsRepository;
 
     @Autowired
+    private PointsService pointsService;
+
+    @Autowired
     private PointsSearchRepository pointsSearchRepository;
 
     @Autowired
@@ -65,7 +69,7 @@ public class PointsResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final PointsResource pointsResource = new PointsResource(pointsRepository, pointsSearchRepository);
+        final PointsResource pointsResource = new PointsResource(pointsService);
         this.restPointsMockMvc = MockMvcBuilders.standaloneSetup(pointsResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
@@ -177,8 +181,8 @@ public class PointsResourceIntTest {
     @Transactional
     public void updatePoints() throws Exception {
         // Initialize the database
-        pointsRepository.saveAndFlush(points);
-        pointsSearchRepository.save(points);
+        pointsService.save(points);
+
         int databaseSizeBeforeUpdate = pointsRepository.findAll().size();
 
         // Update the points
@@ -221,8 +225,8 @@ public class PointsResourceIntTest {
     @Transactional
     public void deletePoints() throws Exception {
         // Initialize the database
-        pointsRepository.saveAndFlush(points);
-        pointsSearchRepository.save(points);
+        pointsService.save(points);
+
         int databaseSizeBeforeDelete = pointsRepository.findAll().size();
 
         // Get the points
@@ -243,8 +247,7 @@ public class PointsResourceIntTest {
     @Transactional
     public void searchPoints() throws Exception {
         // Initialize the database
-        pointsRepository.saveAndFlush(points);
-        pointsSearchRepository.save(points);
+        pointsService.save(points);
 
         // Search the points
         restPointsMockMvc.perform(get("/api/_search/points?query=id:" + points.getId()))

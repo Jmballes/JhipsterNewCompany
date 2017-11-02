@@ -18,5 +18,5 @@ relationship ManyToOne{
 
 paginate Message with pagination
 
-
-
+service Message with serviceClass
+service Points with serviceClass
