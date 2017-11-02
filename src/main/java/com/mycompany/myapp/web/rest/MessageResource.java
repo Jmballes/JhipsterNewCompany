@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
-
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -67,6 +67,7 @@ public class MessageResource {
     @Timed
     public ResponseEntity<Message> createMessage(@Valid @RequestBody Message message) throws URISyntaxException {
         log.debug("REST request to save Message : {}", message);
+
         if (message.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "A new message cannot already have an ID")).body(null);
         }
@@ -74,6 +75,10 @@ public class MessageResource {
         	log.debug("No se ha pasado usuario, usando usuario actual {}",SecurityUtils.getCurrentUserLogin());
         	message.setAuthor(userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get());
         }
+        if (message.getFecha()==null){
+        	message.setFecha(LocalDate.now());
+        }
+        
         Message result = messageRepository.save(message);
         messageSearchRepository.save(result);
         return ResponseEntity.created(new URI("/api/messages/" + result.getId()))

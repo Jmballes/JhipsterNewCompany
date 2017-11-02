@@ -50,9 +50,11 @@ public class PointsResource {
 
     private final PointsSearchRepository pointsSearchRepository;
 
+
     public PointsResource(PointsRepository pointsRepository, PointsSearchRepository pointsSearchRepository) {
         this.pointsRepository = pointsRepository;
         this.pointsSearchRepository = pointsSearchRepository;
+        
     }
 
     /**
@@ -174,16 +176,5 @@ public class PointsResource {
     	return new ResponseEntity<>(count,HttpStatus.OK);
     }
     
-//    public ResponseEntity<List<Points>> getAllPoints(@ApiParam Pageable pageable){
-//    	log.debug("Rest request to get a page of Points");
-//    	Page<Points> page;
-//    	if (SecurityUtils.isCurrentUserInRole(AuthoritiesConstants.ADMIN)){
-//    		page=pointsRepository.findAllByOrderByDateDesc(pageable);
-//    		
-//    	}else{
-//    		page = pointsRepository.findByUserIsCurrentUser(pageable);
-//    	}
-//    	HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "api/points");
-//    	return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
-//    }
+
 }
