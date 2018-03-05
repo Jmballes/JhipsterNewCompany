@@ -140,7 +140,7 @@ public class PointsResource {
     @Timed
     public ResponseEntity<PointsPerWeek> getPointsThisWeek(){
 
-    	return pointsService.getPointsThisWeek();
+    	return pointsService.getPointsFromMeThisWeek();
     }
     
 

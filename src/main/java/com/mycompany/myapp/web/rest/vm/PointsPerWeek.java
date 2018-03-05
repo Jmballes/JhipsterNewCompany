@@ -5,6 +5,7 @@ import java.time.LocalDate;
 public class PointsPerWeek {
 	private LocalDate week;
 	private Integer points;
+	private Integer pointsReceived;
 	public PointsPerWeek(LocalDate week, Integer points){
 		this.week = week;
 		this.points = points;

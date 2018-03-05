@@ -571,7 +571,7 @@
                 <artifactId>dockerfile-maven-plugin</artifactId>
                 <version>${dockerfile-maven-plugin.version}</version>
                 <!--
-                Uncomment the section below to build the docker image with mvn package and and push it with mvn deploy
+                Uncomment the section below to build the docker image with mvn package and and push it with mvn deploy-->
                 <executions>
                     <execution>
                     <id>default</id>
@@ -581,7 +581,7 @@
                     </goals>
                     </execution>
                 </executions>
-                -->
+                
                 <configuration>
                     <repository>jhipsternewcompany</repository>
                     <tag>latest</tag>

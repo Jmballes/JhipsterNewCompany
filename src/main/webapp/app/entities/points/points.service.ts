@@ -59,21 +59,13 @@ export class PointsService {
     private convertResponseWeek(res: Response): ResponseWrapper {
         const jsonResponse = res.json();
         const result = [];
+        console.log('convirtiendoooooooooooooooo:');
+        console.log(res);
         console.log(jsonResponse);
-        console.log('Entrando en convertResponseWeek');
         console.log(jsonResponse.length);
-        for (let i = 0; i < jsonResponse.length; i++) {
-            const user = this.userService.find('1');
-            console.log('El tipo de usuario es:');
-            console.log(typeof user);
-            // result.push(new Points(1,user,3));
-        }
-        const user2 = this.userService.find('1');
-        console.log('El tipo de usuario es:');
-        console.log(typeof user2);
-        result.push(new Points(1, null, null));
+        result.push(jsonResponse);
         return new ResponseWrapper(res.headers, result, res.status);
-    }
+     }
     private convertResponse(res: Response): ResponseWrapper {
 
         const jsonResponse = res.json();

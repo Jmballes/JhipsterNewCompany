@@ -7,6 +7,8 @@ import com.mycompany.myapp.domain.PersistentAuditEvent;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.audit.AuditEvent;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -49,9 +51,11 @@ public class CustomAuditEventRepositoryIntTest {
     private PersistentAuditEvent testOtherUserEvent;
 
     private PersistentAuditEvent testOldUserEvent;
-
+    private Logger logger = LoggerFactory.getLogger(getClass());
     @Before
     public void setup() {
+    	logger.debug("Debugin testing");
+    	logger.info("Debugin testing");
         customAuditEventRepository = new CustomAuditEventRepository(persistenceAuditEventRepository, auditEventConverter);
         persistenceAuditEventRepository.deleteAll();
         Instant oneHourAgo = Instant.now().minusSeconds(3600);

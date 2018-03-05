@@ -5,6 +5,7 @@ import com.mycompany.myapp.JhipsterNewCompanyApp;
 import com.mycompany.myapp.domain.Message;
 import com.mycompany.myapp.domain.User;
 import com.mycompany.myapp.repository.MessageRepository;
+import com.mycompany.myapp.repository.UserRepository;
 import com.mycompany.myapp.service.MessageService;
 import com.mycompany.myapp.repository.search.MessageSearchRepository;
 import com.mycompany.myapp.web.rest.errors.ExceptionTranslator;
@@ -22,6 +23,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.WebApplicationContext;
 
 import javax.persistence.EntityManager;
 import java.time.LocalDate;
@@ -30,9 +32,13 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 /**
  * Test class for the MessageResource REST controller.
  *
@@ -59,6 +65,12 @@ public class MessageResourceIntTest {
 
     @Autowired
     private MessageService messageService;
+    
+    @Autowired
+    private UserRepository userRepository;
+    
+    @Autowired
+    private WebApplicationContext context ;
 
     @Autowired
     private MessageSearchRepository messageSearchRepository;
@@ -82,7 +94,10 @@ public class MessageResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final MessageResource messageResource = new MessageResource(messageService);
+        
+        
+        //final MessageResource messageResource = new MessageResource(messageService);
+        final MessageResource messageResource = new MessageResource(messageService,userRepository);
         this.restMessageMockMvc = MockMvcBuilders.standaloneSetup(messageResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
@@ -119,9 +134,16 @@ public class MessageResourceIntTest {
     @Transactional
     public void createMessage() throws Exception {
         int databaseSizeBeforeCreate = messageRepository.findAll().size();
-
+         // Create security-aware mockMvc
+        restMessageMockMvc = MockMvcBuilders
+         .webAppContextSetup(context)
+         .apply(springSecurity())
+         .build();
         // Create the Message
+        //Al realizar perfrom debemos pasar el usuario 
         restMessageMockMvc.perform(post("/api/messages")
+        		.with(csrf())
+        		.with(user("user"))
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(message)))
             .andExpect(status().isCreated());
@@ -144,12 +166,17 @@ public class MessageResourceIntTest {
     @Transactional
     public void createMessageWithExistingId() throws Exception {
         int databaseSizeBeforeCreate = messageRepository.findAll().size();
-
+        restMessageMockMvc = MockMvcBuilders
+                .webAppContextSetup(context)
+                .apply(springSecurity())
+                .build();
         // Create the Message with an existing ID
         message.setId(1L);
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restMessageMockMvc.perform(post("/api/messages")
+        		.with(user("user"))
+        		.with(csrf())
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(message)))
             .andExpect(status().isBadRequest());
@@ -201,8 +228,16 @@ public class MessageResourceIntTest {
         // Initialize the database
         messageRepository.saveAndFlush(message);
 
+        // Create security-aware mockMvc
+        restMessageMockMvc = MockMvcBuilders
+            .webAppContextSetup(context)
+            .apply(springSecurity())
+            .build();
+
+        
         // Get all the messageList
-        restMessageMockMvc.perform(get("/api/messages?sort=id,desc"))
+        restMessageMockMvc.perform(get("/api/messages?sort=id,desc")
+        	.with(user("admin").roles("ADMIN")))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(message.getId().intValue())))
@@ -278,9 +313,16 @@ public class MessageResourceIntTest {
         int databaseSizeBeforeUpdate = messageRepository.findAll().size();
 
         // Create the Message
-
+     // Create security-aware mockMvc
+        restMessageMockMvc = MockMvcBuilders
+            .webAppContextSetup(context)
+            .apply(springSecurity())
+            .build();
+        
         // If the entity doesn't have an ID, it will be created instead of just being updated
         restMessageMockMvc.perform(put("/api/messages")
+        		.with(user("user"))
+        		.with(csrf())
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(message)))
             .andExpect(status().isCreated());

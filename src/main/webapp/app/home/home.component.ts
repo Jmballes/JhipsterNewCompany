@@ -37,9 +37,14 @@ export class HomeComponent implements OnInit {
     }
     getUserData() {
         this.pointsService.thisWeek().subscribe((points: any) => {
+            console.log('homecomponent.thisWeek() recibe respuesta de service');
+            console.log(points);
             points = points.json;
-            this.pointsThisWeek.points = points[0].id;
-            this.pointsPercentage = points[0].id;
+            console.log(points);
+            console.log('pointsService.thisWeek()');
+            this.pointsThisWeek = points[0];
+            console.log(this.pointsThisWeek);
+            this.pointsPercentage = points[0].points;
 
         });
     }

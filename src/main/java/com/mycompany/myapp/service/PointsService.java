@@ -103,7 +103,7 @@ public class PointsService {
     }
     
     @Transactional(readOnly = true)
-    public ResponseEntity<PointsPerWeek> getPointsThisWeek(){
+    public ResponseEntity<PointsPerWeek> getPointsFromMeThisWeek(){
     	LocalDate now=LocalDate.now();
     	LocalDate startOfWeek = now.with(DayOfWeek.MONDAY);
     	LocalDate endOfWeek= now.with(DayOfWeek.SUNDAY);

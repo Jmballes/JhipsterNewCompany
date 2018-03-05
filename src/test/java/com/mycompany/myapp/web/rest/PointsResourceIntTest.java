@@ -6,6 +6,7 @@ import com.mycompany.myapp.domain.Points;
 import com.mycompany.myapp.domain.User;
 import com.mycompany.myapp.domain.Message;
 import com.mycompany.myapp.repository.PointsRepository;
+import com.mycompany.myapp.repository.UserRepository;
 import com.mycompany.myapp.service.PointsService;
 import com.mycompany.myapp.repository.search.PointsSearchRepository;
 import com.mycompany.myapp.web.rest.errors.ExceptionTranslator;
@@ -23,6 +24,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.WebApplicationContext;
 
 import javax.persistence.EntityManager;
 import java.util.List;
@@ -46,7 +48,12 @@ public class PointsResourceIntTest {
 
     @Autowired
     private PointsService pointsService;
-
+    
+    @Autowired
+    private UserRepository userRepository;
+    
+    @Autowired
+    private WebApplicationContext context ;
     @Autowired
     private PointsSearchRepository pointsSearchRepository;
 
@@ -127,19 +134,21 @@ public class PointsResourceIntTest {
     @Test
     @Transactional
     public void createPointsWithExistingId() throws Exception {
+    	System.out.println("entrando jmb");
         int databaseSizeBeforeCreate = pointsRepository.findAll().size();
-
+        System.out.println("test jmb createPointsWithExistingId");
         // Create the Points with an existing ID
         points.setId(1L);
-
+        System.out.println("points.setId(1L);");
         // An entity with an existing ID cannot be created, so this API call must fail
         restPointsMockMvc.perform(post("/api/points")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(points)))
             .andExpect(status().isBadRequest());
-
+        System.out.println(" restPointsMockMvc.perform");
         // Validate the Points in the database
         List<Points> pointsList = pointsRepository.findAll();
+        System.out.println("List<Points> pointsList = pointsRepository.findAll();");
         assertThat(pointsList).hasSize(databaseSizeBeforeCreate);
     }
 
